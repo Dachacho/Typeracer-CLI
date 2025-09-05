@@ -16,41 +16,54 @@ export const getText = async (req: Request, res: Response) => {
 };
 
 export const finishText = async (req: Request, res: Response) => {
-  const { username, textId, timeTaken, userInput } = req.body;
+  try {
+    const { username, textId, timeTaken, userInput } = req.body;
 
-  if (!username || !textId) {
-    res.status(400).json({ message: "server error" });
+    if (!username || !textId) {
+      res.status(400).json({ message: "server error" });
+      return;
+    }
+
+    const originalText = await prisma.text.findUnique({
+      where: { id: textId },
+    });
+
+    if (!originalText) {
+      return res.status(404).json({ message: "Text not found" });
+    }
+
+    const wordsTyped = userInput.trim().split(/\s+/).length;
+    const accuracy = compare(originalText.content, userInput);
+    const minutes = timeTaken / 60;
+    const wpm = wordsTyped / minutes;
+
+    const result = await prisma.result.create({
+      data: {
+        username,
+        textId,
+        wpm,
+        accuracy,
+        timeTaken,
+      },
+    });
+
+    res.json(result);
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ message: (ex as Error).message });
   }
-
-  const originalText = await prisma.text.findUnique({
-    where: { id: textId },
-  });
-
-  if (!originalText) {
-    return res.status(404).json({ message: "Text not found" });
-  }
-
-  const wordsTyped = userInput.trim().split(/\s+/).length;
-  const accuracy = compare(originalText.content, userInput);
-  const minutes = timeTaken / 60;
-  const wpm = wordsTyped / minutes;
-
-  const result = await prisma.result.create({
-    data: {
-      username,
-      textId,
-      wpm,
-      accuracy,
-      timeTaken,
-    },
-  });
-
-  res.json(result);
 };
 
 export const getLeaderboard = async (req: Request, res: Response) => {
-  const leaderboard = await prisma.result.findMany();
-  res.json(leaderboard);
+  try {
+    const leaderboard = await prisma.result.findMany({
+      orderBy: [{ wpm: "desc" }, { accuracy: "desc" }],
+    });
+    res.json(leaderboard);
+  } catch (ex) {
+    console.log(ex);
+    res.status(500).json({ message: (ex as Error).message });
+  }
 };
 
 function compare(original: string, input: string) {
