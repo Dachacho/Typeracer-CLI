@@ -1,5 +1,4 @@
 import express from "express";
-import prisma from "./prismaClient.ts";
 import { getText } from "./textController.ts";
 
 const app = express();
