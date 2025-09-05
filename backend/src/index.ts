@@ -1,4 +1,5 @@
 import express from "express";
+import prisma from "./prismaClient.ts";
 
 const app = express();
 const port = 3000;
