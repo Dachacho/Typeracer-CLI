@@ -1,5 +1,5 @@
 import express from "express";
-import { getText } from "./textController.ts";
+import { finishText, getText } from "./textController.ts";
 
 const app = express();
 const port = 3000;
@@ -11,6 +11,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/text", getText);
+app.post("/finish", finishText);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
