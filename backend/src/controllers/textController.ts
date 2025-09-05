@@ -1,5 +1,6 @@
-import prisma from "./prismaClient.ts";
+import prisma from "../prismaClient.ts";
 import type { Request, Response } from "express";
+import compare from "../util.ts";
 
 export const getText = async (req: Request, res: Response) => {
   try {
@@ -65,18 +66,3 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     res.status(500).json({ message: (ex as Error).message });
   }
 };
-
-function compare(original: string, input: string) {
-  const originalArr = original.split("");
-  const inputArr = input.split("");
-
-  let correct = 0;
-  for (let i = 0; i < originalArr.length; i++) {
-    if (inputArr[i] === originalArr[i]) {
-      correct++;
-    }
-  }
-
-  const accuracy = correct / originalArr.length;
-  return accuracy;
-}
