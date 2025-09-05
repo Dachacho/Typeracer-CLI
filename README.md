@@ -83,3 +83,7 @@ typeracer/
 - Prisma (SQLite)
 - Inquirer, Chalk, Ora (for CLI UX)
 - Axios
+
+---
+
+_you will have to seed your own data_
