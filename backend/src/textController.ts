@@ -48,7 +48,10 @@ export const finishText = async (req: Request, res: Response) => {
   res.json(result);
 };
 
-export const getLeaderboard = async (req: Request, res: Response) => {};
+export const getLeaderboard = async (req: Request, res: Response) => {
+  const leaderboard = await prisma.result.findMany();
+  res.json(leaderboard);
+};
 
 function compare(original: string, input: string) {
   const originalArr = original.split("");
