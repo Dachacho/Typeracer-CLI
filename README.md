@@ -9,6 +9,16 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - Stores results and displays a leaderboard
 - No authentication required—just enter your username
 
+## Features to be Added
+
+- [ ] **Multiple Rounds:** Allow users to play several rounds in a row and track their average stats.
+- [ ] **Custom Texts:** Let users add their own texts to the database.
+- [ ] **Timed Mode:** Add a mode where users type as much as possible in a set time.
+- [ ] **Export Results:** Allow users to export their results as CSV or JSON.
+- [ ] **Add Multiplayer Support**: Allow users to create rooms where they go against eachother
+
+Feel free to suggest or contribute more features!
+
 ## Getting Started
 
 ### Setup
