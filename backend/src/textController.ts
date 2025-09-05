@@ -18,7 +18,34 @@ export const getText = async (req: Request, res: Response) => {
 export const finishText = async (req: Request, res: Response) => {
   const { username, textId, timeTaken, userInput } = req.body;
 
-  const originalText = await prisma.text.findFirst(textId);
+  if (!username || !textId) {
+    res.status(400).json({ message: "server error" });
+  }
+
+  const originalText = await prisma.text.findUnique({
+    where: { id: textId },
+  });
+
+  if (!originalText) {
+    return res.status(404).json({ message: "Text not found" });
+  }
+
+  const wordsTyped = userInput.trim().split(/\s+/).length;
+  const accuracy = compare(originalText.content, userInput);
+  const minutes = timeTaken / 60;
+  const wpm = wordsTyped / minutes;
+
+  const result = await prisma.result.create({
+    data: {
+      username,
+      textId,
+      wpm,
+      accuracy,
+      timeTaken,
+    },
+  });
+
+  res.json(result);
 };
 
 export const getLeaderboard = async (req: Request, res: Response) => {};
