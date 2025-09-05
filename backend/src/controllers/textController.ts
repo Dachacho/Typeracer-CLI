@@ -1,6 +1,6 @@
-import prisma from "../prismaClient.ts";
+import prisma from "../utils/prismaClient.ts";
 import type { Request, Response } from "express";
-import compare from "../util.ts";
+import compare from "../utils/util.ts";
 
 export const getText = async (req: Request, res: Response) => {
   try {
