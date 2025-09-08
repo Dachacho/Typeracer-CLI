@@ -13,10 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Text{
-  id Int @id @default(autoincrement())
+model Text {
+  id      Int    @id @default(autoincrement())
   content String
-  rooms Room[]
+  rooms   Room[]
 }
 
 model Room {
@@ -32,7 +32,7 @@ model Result {
   id        Int      @id @default(autoincrement())
   username  String
   textId    Int
-  roomId    Int?     // New: link to Room
+  roomId    Int? // New: link to Room
   wpm       Float
   accuracy  Float
   timeTaken Float
