@@ -26,3 +26,15 @@ export const createRoom = async (req: Request, res: Response) => {
     res.json(500).json({ message: err.message });
   }
 };
+
+export const joinRoom = async (req: Request, res: Response) => {
+  const { roomId, username } = req.body;
+
+  if (!roomId || username) {
+    res.status(400).json({ message: "username and roomId are needed" });
+  }
+
+  const room = await prisma.room.findUnique({
+    where: { id: roomId },
+  });
+};
