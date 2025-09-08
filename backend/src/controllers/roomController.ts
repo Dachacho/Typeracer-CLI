@@ -28,13 +28,62 @@ export const createRoom = async (req: Request, res: Response) => {
 };
 
 export const joinRoom = async (req: Request, res: Response) => {
-  const { roomId, username } = req.body;
+  try {
+    const { roomId, username } = req.body;
 
-  if (!roomId || username) {
-    res.status(400).json({ message: "username and roomId are needed" });
+    if (!roomId || username) {
+      res.status(400).json({ message: "username and roomId are needed" });
+    }
+
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) {
+      return res.status(404).json({ message: "room not found" });
+    }
+
+    const existing = await prisma.participant.findFirst({
+      where: { roomId, username },
+    });
+
+    if (existing) {
+      return res.status(400).json({ message: "user already joined" });
+    }
+
+    const participant = await prisma.participant.create({
+      data: { roomId, username },
+    });
+
+    return res.json(participant);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
   }
+};
 
-  const room = await prisma.room.findUnique({
-    where: { id: roomId },
-  });
+export const startRoom = async (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.body;
+
+    if (!roomId) {
+      res.status(400).json({ message: "roomId is needed" });
+    }
+
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) {
+      return res.status(404).json({ message: "room not found" });
+    }
+
+    const updatedRoom = await prisma.room.update({
+      where: { id: roomId },
+      data: { status: "started" },
+    });
+
+    res.json(updatedRoom);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
 };
