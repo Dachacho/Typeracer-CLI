@@ -164,6 +164,10 @@ export const getRoom = async (req: Request, res: Response) => {
       where: { id: numericRoomId },
     });
 
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
     res.json(room);
   } catch (err) {
     console.log(err);
