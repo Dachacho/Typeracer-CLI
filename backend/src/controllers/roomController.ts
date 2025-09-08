@@ -22,8 +22,9 @@ export const createRoom = async (req: Request, res: Response) => {
     });
 
     res.json(room);
-  } catch (err: any) {
-    res.json(500).json({ message: err.message });
+  } catch (err) {
+    console.log(err);
+    res.json(500).json({ message: (err as Error).message });
   }
 };
 
@@ -56,8 +57,9 @@ export const joinRoom = async (req: Request, res: Response) => {
     });
 
     return res.json(participant);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: (err as Error).message });
   }
 };
 
@@ -83,7 +85,88 @@ export const startRoom = async (req: Request, res: Response) => {
     });
 
     res.json(updatedRoom);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: (err as Error).message });
+  }
+};
+
+export const finishRoom = async (req: Request, res: Response) => {
+  try {
+    const { username, roomId, userInput, timeTaken } = req.body;
+
+    if (!username || !roomId || !userInput || !timeTaken) {
+      return res.status(400).json({ message: "missing required fields" });
+    }
+
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) {
+      return res.status(404).json({ message: "room not found" });
+    }
+
+    const originalText = await prisma.text.findUnique({
+      where: { id: room.textId },
+    });
+
+    if (!originalText) {
+      return res.status(404).json({ message: "Text not found" });
+    }
+
+    const wordsTyped = userInput.trim().split(/\s+/).length;
+    const accuracy = compare(originalText.content, userInput);
+    const minutes = timeTaken / 60;
+    const wpm = wordsTyped / minutes;
+
+    const result = await prisma.result.create({
+      data: {
+        username,
+        textId: room.textId,
+        roomId,
+        wpm,
+        accuracy,
+        timeTaken,
+      },
+    });
+    res.json(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: (err as Error).message });
+  }
+};
+
+export const getRooms = async (req: Request, res: Response) => {
+  try {
+    const rooms = await prisma.room.findMany();
+    res.json(rooms);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: (err as Error).message });
+  }
+};
+
+export const getRoom = async (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+
+    if (!roomId) {
+      return res.status(400).json({ message: "provide roomId" });
+    }
+
+    const numericRoomId = Number(roomId);
+    if (isNaN(numericRoomId)) {
+      return res.status(400).json({ message: "roomId must be a number" });
+    }
+
+    const room = await prisma.room.findUnique({
+      where: { id: numericRoomId },
+    });
+
+    res.json(room);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: (err as Error).message });
   }
 };
