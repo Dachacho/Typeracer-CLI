@@ -16,14 +16,26 @@ datasource db {
 model Text{
   id Int @id @default(autoincrement())
   content String
+  rooms Room[]
 }
 
-model Result{
-  id Int @id @default(autoincrement())
-  username String 
-  textId Int 
-  wpm Float 
-  accuracy Float
-  timeTaken Float 
+model Room {
+  id        Int      @id @default(autoincrement())
+  textId    Int
+  status    String
   createdAt DateTime @default(now())
+  results   Result[]
+  text      Text     @relation(fields: [textId], references: [id])
+}
+
+model Result {
+  id        Int      @id @default(autoincrement())
+  username  String
+  textId    Int
+  roomId    Int?     // New: link to Room
+  wpm       Float
+  accuracy  Float
+  timeTaken Float
+  createdAt DateTime @default(now())
+  room      Room?    @relation(fields: [roomId], references: [id])
 }
