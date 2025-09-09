@@ -1,6 +1,7 @@
 import prisma from "../utils/prismaClient.ts";
 import type { Request, Response } from "express";
 import compare from "../utils/util.ts";
+import { io } from "../index.ts";
 
 export const createRoom = async (req: Request, res: Response) => {
   try {
@@ -32,8 +33,10 @@ export const joinRoom = async (req: Request, res: Response) => {
   try {
     const { roomId, username } = req.body;
 
-    if (!roomId || username) {
-      res.status(400).json({ message: "username and roomId are needed" });
+    if (!roomId || !username) {
+      return res
+        .status(400)
+        .json({ message: "username and roomId are needed" });
     }
 
     const room = await prisma.room.findUnique({
@@ -130,6 +133,17 @@ export const finishRoom = async (req: Request, res: Response) => {
         timeTaken,
       },
     });
+
+    const participantCount = await prisma.participant.count({
+      where: { roomId },
+    });
+    const resultCount = await prisma.result.count({ where: { roomId } });
+
+    if (participantCount === resultCount) {
+      const results = await prisma.result.findMany({ where: { roomId } });
+      io.to(`room-${roomId}`).emit("raceFinished", results);
+    }
+
     res.json(result);
   } catch (err) {
     console.log(err);
@@ -162,6 +176,7 @@ export const getRoom = async (req: Request, res: Response) => {
 
     const room = await prisma.room.findUnique({
       where: { id: numericRoomId },
+      include: { text: true },
     });
 
     if (!room) {

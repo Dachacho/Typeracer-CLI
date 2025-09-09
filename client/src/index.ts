@@ -39,10 +39,10 @@ async function main() {
         type: "list",
         name: "chosenRoomId",
         message: "select a room to join",
-        choices: rooms.map((r: any) => {
-          name: `room ${r.id} (${r.status})`;
-          value: r.id;
-        }),
+        choices: rooms.map((r: any) => ({
+          name: `room ${r.id} (${r.status})`,
+          value: r.id,
+        })),
       },
     ]);
     roomId = chosenRoomId;
@@ -52,6 +52,15 @@ async function main() {
   console.log(chalk.blue(`joined room ${roomId}. waiting to start ...`));
 
   socket.emit("joinRoom", roomId);
+
+  if (action === "create") {
+    const { startNow } = await inquirer.prompt([
+      { type: "confirm", name: "startNow", message: "Start the race now?" },
+    ]);
+    if (startNow) {
+      socket.emit("startRace", roomId);
+    }
+  }
 
   await new Promise<void>((resolve) => {
     socket.on("raceStarted", () => {
@@ -88,6 +97,28 @@ async function main() {
     )
   );
 
+  socket.on("raceFinished", (results) => {
+    console.log(chalk.green("\nAll players have finished!"));
+    results.forEach((entry: any, i: number) => {
+      console.log(
+        `${i + 1}. ${entry.username} - WPM: ${entry.wpm.toFixed(
+          2
+        )}, Accuracy: ${(entry.accuracy * 100).toFixed(2)}%`
+      );
+    });
+  });
+
+  const { data: updatedRoom } = await axios.get(`${API_URL}/room/${roomId}`);
+  if (updatedRoom.results) {
+    console.log(chalk.magenta("\nRoom Results:"));
+    updatedRoom.results.forEach((entry: any, i: number) => {
+      console.log(
+        `${i + 1}. ${entry.username} - WPM: ${entry.wpm.toFixed(
+          2
+        )}, Accuracy: ${(entry.accuracy * 100).toFixed(2)}%`
+      );
+    });
+  }
   // version before from single player type thing
   //   const spinner = ora("fetching text...").start();
   //   const { data: text } = await axios.get("http://localhost:3000/text");
