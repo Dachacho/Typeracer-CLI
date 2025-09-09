@@ -47,6 +47,47 @@ async function main() {
     ]);
     roomId = chosenRoomId;
   }
+
+  await axios.post(`${API_URL}/room/join`, { roomId, username });
+  console.log(chalk.blue(`joined room ${roomId}. waiting to start ...`));
+
+  socket.emit("joinRoom", roomId);
+
+  await new Promise<void>((resolve) => {
+    socket.on("raceStarted", () => {
+      console.log(chalk.green("\nrace started"));
+      resolve();
+    });
+  });
+
+  const { data: room } = await axios.get(`${API_URL}/room/${roomId}`);
+  const { text } = room;
+
+  console.log(chalk.yellow("\ntype the following text:"));
+  console.log(chalk.cyan(text.content));
+  const start = Date.now();
+
+  const { userInput } = await inquirer.prompt([
+    { type: "input", name: "userInput", message: "your input:" },
+  ]);
+  const timeTaken = (Date.now() - start) / 1000;
+
+  const resultRes = await axios.post(`${API_URL}/room/finish`, {
+    username,
+    roomId,
+    userInput,
+    timeTaken,
+  });
+
+  const result = resultRes.data;
+  console.log(
+    chalk.green(
+      `\nyour WPM: ${result.wpm.toFixed(2)}, Accuracy: ${(
+        result.accuracy * 100
+      ).toFixed(2)}%`
+    )
+  );
+
   // version before from single player type thing
   //   const spinner = ora("fetching text...").start();
   //   const { data: text } = await axios.get("http://localhost:3000/text");
