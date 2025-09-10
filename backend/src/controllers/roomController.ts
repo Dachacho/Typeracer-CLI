@@ -6,6 +6,10 @@ import { io } from "../index.ts";
 export const createRoom = async (req: Request, res: Response) => {
   try {
     const count = await prisma.text.count();
+    if (count === 0) {
+      return res.status(404).json({ message: "No texts available" });
+    }
+
     const randomIndex = Math.floor(Math.random() * count);
     const randomText = await prisma.text.findFirst({
       skip: randomIndex,
@@ -25,7 +29,7 @@ export const createRoom = async (req: Request, res: Response) => {
     res.json(room);
   } catch (err) {
     console.log(err);
-    return res.json(500).json({ message: (err as Error).message });
+    return res.status(500).json({ message: (err as Error).message });
   }
 };
 
@@ -45,6 +49,12 @@ export const joinRoom = async (req: Request, res: Response) => {
 
     if (!room) {
       return res.status(404).json({ message: "room not found" });
+    }
+
+    if (room.status !== "waiting") {
+      return res
+        .status(400)
+        .json({ message: "cannot join room already started" });
     }
 
     const existing = await prisma.participant.findFirst({
@@ -80,6 +90,10 @@ export const startRoom = async (req: Request, res: Response) => {
 
     if (!room) {
       return res.status(404).json({ message: "room not found" });
+    }
+
+    if (room.status === "started") {
+      return res.status(400).json({ message: "room already started" });
     }
 
     const updatedRoom = await prisma.room.update({
@@ -176,7 +190,7 @@ export const getRoom = async (req: Request, res: Response) => {
 
     const room = await prisma.room.findUnique({
       where: { id: numericRoomId },
-      include: { text: true },
+      include: { text: true, participants: true },
     });
 
     if (!room) {

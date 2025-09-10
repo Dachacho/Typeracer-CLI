@@ -20,9 +20,8 @@ export const finishText = async (req: Request, res: Response) => {
   try {
     const { username, textId, timeTaken, userInput } = req.body;
 
-    if (!username || !textId) {
-      res.status(400).json({ message: "server error" });
-      return;
+    if (!username || !textId || !userInput || !timeTaken) {
+      return res.status(400).json({ message: "server error" });
     }
 
     const originalText = await prisma.text.findUnique({
