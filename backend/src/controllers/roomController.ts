@@ -217,3 +217,30 @@ export const getRoom = async (req: Request, res: Response) => {
     return res.status(500).json({ message: (err as Error).message });
   }
 };
+
+export const getRoomLeaderboard = async (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+    if (!roomId) {
+      return res.status(400).json({ message: "provide roomId" });
+    }
+    const numericRoomId = Number(roomId);
+    if (isNaN(numericRoomId)) {
+      return res.status(400).json({ message: "roomId must be a number" });
+    }
+
+    const results = await prisma.result.findMany({
+      where: { roomId: numericRoomId },
+      orderBy: [{ wpm: "desc" }, { accuracy: "desc" }],
+    });
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "No results for this room yet" });
+    }
+
+    res.json(results);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: (err as Error).message });
+  }
+};
