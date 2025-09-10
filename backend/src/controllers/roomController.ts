@@ -26,7 +26,7 @@ export const createRoom = async (req: Request, res: Response) => {
       },
     });
 
-    res.json(room);
+    res.status(201).json(room);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: (err as Error).message });
@@ -37,10 +37,12 @@ export const joinRoom = async (req: Request, res: Response) => {
   try {
     const { roomId, username } = req.body;
 
-    if (!roomId || !username) {
-      return res
-        .status(400)
-        .json({ message: "username and roomId are needed" });
+    if (!username || typeof username !== "string" || !username.trim()) {
+      return res.status(400).json({ message: "invalid username" });
+    }
+
+    if (!roomId) {
+      return res.status(400).json({ message: "roomId is needed" });
     }
 
     const room = await prisma.room.findUnique({
@@ -69,7 +71,7 @@ export const joinRoom = async (req: Request, res: Response) => {
       data: { roomId, username },
     });
 
-    return res.json(participant);
+    return res.status(201).json(participant);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: (err as Error).message });
@@ -101,7 +103,7 @@ export const startRoom = async (req: Request, res: Response) => {
       data: { status: "started" },
     });
 
-    res.json(updatedRoom);
+    res.status(201).json(updatedRoom);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: (err as Error).message });
@@ -112,7 +114,11 @@ export const finishRoom = async (req: Request, res: Response) => {
   try {
     const { username, roomId, userInput, timeTaken } = req.body;
 
-    if (!username || !roomId || !userInput || !timeTaken) {
+    if (!username || typeof username !== "string" || !username.trim()) {
+      return res.status(400).json({ message: "invalid username" });
+    }
+
+    if (!roomId || !userInput || !timeTaken) {
       return res.status(400).json({ message: "missing required fields" });
     }
 
@@ -137,6 +143,14 @@ export const finishRoom = async (req: Request, res: Response) => {
     const minutes = timeTaken / 60;
     const wpm = wordsTyped / minutes;
 
+    const existingResult = await prisma.result.findFirst({
+      where: { roomId, username },
+    });
+
+    if (existingResult) {
+      return res.status(400).json({ message: "result already submitted" });
+    }
+
     const result = await prisma.result.create({
       data: {
         username,
@@ -158,7 +172,7 @@ export const finishRoom = async (req: Request, res: Response) => {
       io.to(`room-${roomId}`).emit("raceFinished", results);
     }
 
-    res.json(result);
+    res.status(201).json(result);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: (err as Error).message });
@@ -168,7 +182,7 @@ export const finishRoom = async (req: Request, res: Response) => {
 export const getRooms = async (req: Request, res: Response) => {
   try {
     const rooms = await prisma.room.findMany();
-    res.json(rooms);
+    res.status(201).json(rooms);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: (err as Error).message });
@@ -197,7 +211,7 @@ export const getRoom = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    res.json(room);
+    res.status(201).json(room);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: (err as Error).message });

@@ -9,7 +9,7 @@ export const getText = async (req: Request, res: Response) => {
     const randomText = await prisma.text.findFirst({
       skip: randomIndex,
     });
-    res.json(randomText);
+    res.status(201).json(randomText);
   } catch (ex) {
     console.log(ex);
     return res.status(500).json({ message: (ex as Error).message });
@@ -47,7 +47,7 @@ export const finishText = async (req: Request, res: Response) => {
       },
     });
 
-    res.json(result);
+    res.status(201).json(result);
   } catch (ex) {
     console.log(ex);
     return res.status(500).json({ message: (ex as Error).message });
@@ -59,7 +59,7 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     const leaderboard = await prisma.result.findMany({
       orderBy: [{ wpm: "desc" }, { accuracy: "desc" }],
     });
-    res.json(leaderboard);
+    res.status(201).json(leaderboard);
   } catch (ex) {
     console.log(ex);
     return res.status(500).json({ message: (ex as Error).message });
