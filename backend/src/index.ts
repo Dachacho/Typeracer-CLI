@@ -21,9 +21,9 @@ app.use(cors());
 io.on("connection", (socket) => {
   console.log("user conneted: ", socket.id);
 
-  socket.on("joinRoom", (roomId) => {
+  socket.on("joinRoom", (roomId, username) => {
     socket.join(`room-${roomId}`);
-    io.to(`room-${roomId}`).emit("userJoined", socket.id);
+    io.to(`room-${roomId}`).emit("userJoined", { username });
   });
 
   socket.on("startRace", (roomId) => {

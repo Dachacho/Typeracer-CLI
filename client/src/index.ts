@@ -7,6 +7,10 @@ import { io } from "socket.io-client";
 const API_URL = "http://localhost:3000";
 const socket = io(API_URL);
 
+socket.on("userJoined", ({ username }) => {
+  console.log(chalk.yellowBright(`\n${username} joined the room!`));
+});
+
 async function main() {
   try {
     const { username } = await inquirer.prompt([
@@ -71,7 +75,7 @@ async function main() {
       return;
     }
 
-    socket.emit("joinRoom", roomId);
+    socket.emit("joinRoom", roomId, username);
 
     if (action === "create") {
       const { startNow } = await inquirer.prompt([
