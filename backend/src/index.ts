@@ -31,11 +31,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("startRace", (roomId) => {
-    io.to(`room-${roomId}`).emit("raceStarted");
+    let count = 3;
+    const interval = setInterval(() => {
+      if (count > 0) {
+        io.to(`room-${roomId}`).emit("countdown", count);
+        count--;
+      } else {
+        clearInterval(interval);
+        io.to(`room-${roomId}`).emit("raceStarted");
+      }
+    }, 1000);
+    // io.to(`room-${roomId}`).emit("raceStarted");
   });
 
   socket.on("finishRace", (roomId, username, wpm, accuracy) => {
-    io.to(`room-${roomId}`).emit("userFinished", { username, wpm, accuracy });
+    io.to(`room-${roomId}`).emit("raceFinished", { username, wpm, accuracy });
   });
 });
 

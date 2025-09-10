@@ -90,6 +90,10 @@ async function main() {
       }
     }
 
+    socket.on("countdown", (count) => {
+      console.log(chalk.yellowBright(`\nRace starts in: ${count}`));
+    });
+
     await new Promise<void>((resolve) => {
       socket.on("raceStarted", () => {
         console.log(chalk.green("\nrace started"));
