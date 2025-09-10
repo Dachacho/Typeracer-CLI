@@ -44,9 +44,9 @@ io.on("connection", (socket) => {
     // io.to(`room-${roomId}`).emit("raceStarted");
   });
 
-  socket.on("finishRace", (roomId, username, wpm, accuracy) => {
-    io.to(`room-${roomId}`).emit("raceFinished", { username, wpm, accuracy });
-  });
+  // socket.on("finishRace", (roomId, username, wpm, accuracy) => {
+  //   io.to(`room-${roomId}`).emit("raceFinished", { username, wpm, accuracy });
+  // });
 });
 
 app.use(textRouter);

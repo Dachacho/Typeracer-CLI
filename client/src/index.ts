@@ -11,6 +11,17 @@ socket.on("userJoined", ({ username }) => {
   console.log(chalk.yellowBright(`\n${username} joined the room!`));
 });
 
+socket.on("raceFinished", (results) => {
+  console.log(chalk.green("\nAll players have finished!"));
+  results.forEach((entry: any, i: number) => {
+    console.log(
+      `${i + 1}. ${entry.username} - WPM: ${entry.wpm.toFixed(2)}, Accuracy: ${(
+        entry.accuracy * 100
+      ).toFixed(2)}%`
+    );
+  });
+});
+
 async function main() {
   try {
     const { username } = await inquirer.prompt([
@@ -142,17 +153,6 @@ async function main() {
         ).toFixed(2)}%`
       )
     );
-
-    socket.on("raceFinished", (results) => {
-      console.log(chalk.green("\nAll players have finished!"));
-      results.forEach((entry: any, i: number) => {
-        console.log(
-          `${i + 1}. ${entry.username} - WPM: ${entry.wpm.toFixed(
-            2
-          )}, Accuracy: ${(entry.accuracy * 100).toFixed(2)}%`
-        );
-      });
-    });
 
     try {
       const { data: updatedRoom } = await axios.get(
