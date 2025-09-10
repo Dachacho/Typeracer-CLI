@@ -12,7 +12,7 @@ export const getText = async (req: Request, res: Response) => {
     res.json(randomText);
   } catch (ex) {
     console.log(ex);
-    res.status(500).json({ message: (ex as Error).message });
+    return res.status(500).json({ message: (ex as Error).message });
   }
 };
 
@@ -51,7 +51,7 @@ export const finishText = async (req: Request, res: Response) => {
     res.json(result);
   } catch (ex) {
     console.log(ex);
-    res.status(500).json({ message: (ex as Error).message });
+    return res.status(500).json({ message: (ex as Error).message });
   }
 };
 
@@ -63,6 +63,6 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     res.json(leaderboard);
   } catch (ex) {
     console.log(ex);
-    res.status(500).json({ message: (ex as Error).message });
+    return res.status(500).json({ message: (ex as Error).message });
   }
 };

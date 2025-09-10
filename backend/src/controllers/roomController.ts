@@ -25,7 +25,7 @@ export const createRoom = async (req: Request, res: Response) => {
     res.json(room);
   } catch (err) {
     console.log(err);
-    res.json(500).json({ message: (err as Error).message });
+    return res.json(500).json({ message: (err as Error).message });
   }
 };
 
@@ -62,7 +62,7 @@ export const joinRoom = async (req: Request, res: Response) => {
     return res.json(participant);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: (err as Error).message });
+    return res.status(500).json({ message: (err as Error).message });
   }
 };
 
@@ -71,7 +71,7 @@ export const startRoom = async (req: Request, res: Response) => {
     const { roomId } = req.body;
 
     if (!roomId) {
-      res.status(400).json({ message: "roomId is needed" });
+      return res.status(400).json({ message: "roomId is needed" });
     }
 
     const room = await prisma.room.findUnique({
@@ -90,7 +90,7 @@ export const startRoom = async (req: Request, res: Response) => {
     res.json(updatedRoom);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: (err as Error).message });
+    return res.status(500).json({ message: (err as Error).message });
   }
 };
 
@@ -147,7 +147,7 @@ export const finishRoom = async (req: Request, res: Response) => {
     res.json(result);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: (err as Error).message });
+    return res.status(500).json({ message: (err as Error).message });
   }
 };
 
@@ -157,7 +157,7 @@ export const getRooms = async (req: Request, res: Response) => {
     res.json(rooms);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: (err as Error).message });
+    return res.status(500).json({ message: (err as Error).message });
   }
 };
 
@@ -186,6 +186,6 @@ export const getRoom = async (req: Request, res: Response) => {
     res.json(room);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: (err as Error).message });
+    return res.status(500).json({ message: (err as Error).message });
   }
 };
