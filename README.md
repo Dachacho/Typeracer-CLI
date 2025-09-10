@@ -4,6 +4,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 
 ## Features
 
+- **Singleplayer:** Race against the clock and compete with the leaderboard.
 - **Multiplayer Rooms:** Create or join real-time races with friends in your terminal.
 - **Live Notifications:** See when other users join your room.
 - **Synchronized Countdown:** All players start at the same time.
