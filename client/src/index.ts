@@ -77,6 +77,10 @@ async function main() {
 
     socket.emit("joinRoom", roomId, username);
 
+    socket.on("participantCount", ({ count }) => {
+      console.log(`There are now ${count} participants in the room.`);
+    });
+
     if (action === "create") {
       const { startNow } = await inquirer.prompt([
         { type: "confirm", name: "startNow", message: "Start the race now?" },
