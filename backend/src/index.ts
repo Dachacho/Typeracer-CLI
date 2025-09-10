@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", (roomId, username) => {
     socket.join(`room-${roomId}`);
-    io.to(`room-${roomId}`).emit("userJoined", { username });
+    socket.to(`room-${roomId}`).emit("userJoined", { username });
   });
 
   socket.on("startRace", (roomId) => {
