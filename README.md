@@ -12,6 +12,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - **Room and Global Leaderboards:** See results for each race and overall.
 - **Post-Race Menu:** Play again, view leaderboard, or quit—no need to restart the app.
 - **No Authentication Required:** Just enter your username and play.
+- **API Documentation:** OpenAPI/Swagger documentation for all the endpoints over at /api-docs.
 
 ## Features to be Added
 
