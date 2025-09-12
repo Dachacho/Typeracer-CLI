@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import prisma from "./utils/prismaClient.ts";
 import logger from "./utils/logger.ts";
+import { setIo } from "./controllers/roomController.ts";
 
 dotenv.config();
 
@@ -11,6 +12,9 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: "*" },
 });
+
+setIo(io);
+
 const port = process.env.PORT || 3000;
 
 io.on("connection", (socket) => {

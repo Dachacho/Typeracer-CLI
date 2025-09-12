@@ -1,8 +1,12 @@
 import prisma from "../utils/prismaClient.ts";
 import type { Request, Response } from "express";
 import compare from "../utils/util.ts";
-import { io } from "../index.ts";
 import logger from "../utils/logger.ts";
+
+let ioInstance: any = null;
+export function setIo(io: any) {
+  ioInstance = io;
+}
 
 export const createRoom = async (req: Request, res: Response) => {
   try {
@@ -190,7 +194,7 @@ export const finishRoom = async (req: Request, res: Response) => {
 
     if (participantCount === resultCount) {
       const results = await prisma.result.findMany({ where: { roomId } });
-      io.to(`room-${roomId}`).emit("raceFinished", results);
+      ioInstance?.to(`room-${roomId}`).emit("raceFinished", results);
 
       await prisma.participant.deleteMany({ where: { roomId } });
       await prisma.room.delete({ where: { id: roomId } });
