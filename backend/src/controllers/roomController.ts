@@ -207,7 +207,7 @@ export const finishRoom = async (req: Request, res: Response) => {
 export const getRooms = async (req: Request, res: Response) => {
   try {
     const rooms = await prisma.room.findMany();
-    res.status(201).json(rooms);
+    res.status(200).json(rooms);
   } catch (err) {
     console.error(`getRooms error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
@@ -239,7 +239,7 @@ export const getRoom = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    res.status(201).json(room);
+    res.status(200).json(room);
   } catch (err) {
     logger.error(`getRoom error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
@@ -269,7 +269,7 @@ export const getRoomLeaderboard = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "No results for this room yet" });
     }
 
-    res.json(results);
+    res.status(200).json(results);
   } catch (err) {
     logger.error(`getRoomLeaderboard error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
