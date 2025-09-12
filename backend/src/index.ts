@@ -6,10 +6,29 @@ import { Server } from "socket.io";
 import textRouter from "./routes/textRouter.ts";
 import roomRouter from "./routes/roomRouter.ts";
 import prisma from "./utils/prismaClient.ts";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
 dotenv.config();
 
 const app = express();
+
+try {
+  const swaggerSpec = swaggerJsdoc({
+    definition: {
+      openapi: "3.0.0",
+      info: {
+        title: "Typeracer API",
+        version: "1.0.0",
+      },
+    },
+    apis: ["./src/routes/*.ts"],
+  });
+
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+} catch (err) {
+  console.error("failed: ", err);
+}
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: "*" },
