@@ -1,18 +1,11 @@
 import app from "../app.ts";
 import dotenv from "dotenv";
-import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import prisma from "./utils/prismaClient.ts";
-import swaggerUi from "swagger-ui-express";
-import yaml from "yamljs";
 import logger from "./utils/logger.ts";
 
 dotenv.config();
-app.use(cors());
-
-const swaggerDocument = yaml.load("./src/docs/swagger.yaml");
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
