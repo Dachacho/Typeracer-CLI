@@ -14,6 +14,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - **No Authentication Required:** Just enter your username and play.
 - **API Documentation:** OpenAPI/Swagger documentation for all the endpoints over at /api-docs.
 - **Structured Logging:** All backend events and errors are logged with timestamps using Winston.
+- **Unit Tests:** Backend endpoints are covered by automated tests using Vitest and Supertest.
 
 ## Features to be Added
 
@@ -74,6 +75,15 @@ cd ../client
 npm run dev
 ```
 
+## Running Tests
+
+To run the backend unit tests:
+
+```sh
+cd backend
+npm test
+```
+
 ## Usage
 
 1. Enter your username when prompted.
@@ -84,9 +94,11 @@ npm run dev
 ## Project Structure
 
 ```
+
 typeracer/
-  backend/   # Express API, Prisma models, SQLite DB
-  client/    # CLI app (TypeScript, Inquirer, Axios)
+backend/ # Express API, Prisma models, SQLite DB
+client/ # CLI app (TypeScript, Inquirer, Axios)
+
 ```
 
 ## Tech Stack
@@ -102,4 +114,9 @@ typeracer/
 
 ---
 
-_you will have to seed your own data for texts_
+_You must seed your database with sample texts before running the app or tests. See below._
+
+```sh
+cd backend
+npx ts-node prisma/seed.ts
+```
