@@ -197,7 +197,10 @@ export const finishRoom = async (req: Request, res: Response) => {
       ioInstance?.to(`room-${roomId}`).emit("raceFinished", results);
 
       await prisma.participant.deleteMany({ where: { roomId } });
-      await prisma.room.delete({ where: { id: roomId } });
+      await prisma.room.update({
+        where: { id: roomId },
+        data: { status: "finished" },
+      });
       logger.info(`room ${roomId} finished and cleaned up`);
     }
 
