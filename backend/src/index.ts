@@ -1,18 +1,15 @@
-import express from "express";
+import app from "../app.ts";
 import dotenv from "dotenv";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import textRouter from "./routes/textRouter.ts";
-import roomRouter from "./routes/roomRouter.ts";
 import prisma from "./utils/prismaClient.ts";
 import swaggerUi from "swagger-ui-express";
 import yaml from "yamljs";
 import logger from "./utils/logger.ts";
 
 dotenv.config();
-
-const app = express();
+app.use(cors());
 
 const swaggerDocument = yaml.load("./src/docs/swagger.yaml");
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -23,11 +20,8 @@ const io = new Server(httpServer, {
 });
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(cors());
-
 io.on("connection", (socket) => {
-  logger.info("user conneted: ", socket.id);
+  logger.info(`user connected: ${socket.id}`);
 
   socket.on("joinRoom", async (roomId, username) => {
     socket.join(`room-${roomId}`);
@@ -48,26 +42,11 @@ io.on("connection", (socket) => {
         io.to(`room-${roomId}`).emit("raceStarted");
       }
     }, 1000);
-    // io.to(`room-${roomId}`).emit("raceStarted");
   });
-
-  // socket.on("finishRace", (roomId, username, wpm, accuracy) => {
-  //   io.to(`room-${roomId}`).emit("raceFinished", { username, wpm, accuracy });
-  // });
 });
-
-app.use(textRouter);
-app.use(roomRouter);
-
-// app.get("/", (req, res) => {
-//   res.send("backend is running");
-// });
 
 httpServer.listen(port, () => {
   logger.info(`server running on ${port}`);
 });
 
-// app.listen(port, () => {
-//   console.log(`server is running on port ${port}`);
-// });
 export { io };
