@@ -170,6 +170,10 @@ export const finishRoom = async (req: Request, res: Response) => {
     if (participantCount === resultCount) {
       const results = await prisma.result.findMany({ where: { roomId } });
       io.to(`room-${roomId}`).emit("raceFinished", results);
+
+      await prisma.result.deleteMany({ where: { roomId } });
+      await prisma.participant.deleteMany({ where: { roomId } });
+      await prisma.room.delete({ where: { id: roomId } });
     }
 
     res.status(201).json(result);
