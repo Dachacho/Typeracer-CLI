@@ -8,6 +8,7 @@ import roomRouter from "./routes/roomRouter.ts";
 import prisma from "./utils/prismaClient.ts";
 import swaggerUi from "swagger-ui-express";
 import yaml from "yamljs";
+import logger from "./utils/logger.ts";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.use(express.json());
 app.use(cors());
 
 io.on("connection", (socket) => {
-  console.log("user conneted: ", socket.id);
+  logger.info("user conneted: ", socket.id);
 
   socket.on("joinRoom", async (roomId, username) => {
     socket.join(`room-${roomId}`);
@@ -63,7 +64,7 @@ app.use(roomRouter);
 // });
 
 httpServer.listen(port, () => {
-  console.log(`server running on ${port}`);
+  logger.info(`server running on ${port}`);
 });
 
 // app.listen(port, () => {

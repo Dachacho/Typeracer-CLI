@@ -2,11 +2,13 @@ import prisma from "../utils/prismaClient.ts";
 import type { Request, Response } from "express";
 import compare from "../utils/util.ts";
 import { io } from "../index.ts";
+import logger from "../utils/logger.ts";
 
 export const createRoom = async (req: Request, res: Response) => {
   try {
     const count = await prisma.text.count();
     if (count === 0) {
+      logger.warn("no texts avaliable for room creation");
       return res.status(404).json({ message: "No texts available" });
     }
 
@@ -16,6 +18,7 @@ export const createRoom = async (req: Request, res: Response) => {
     });
 
     if (!randomText) {
+      logger.error("failed to get random text for room creation");
       return res.status(500).json({ message: "failed to get text" });
     }
 
@@ -26,9 +29,10 @@ export const createRoom = async (req: Request, res: Response) => {
       },
     });
 
+    logger.info(`room ${room.id} created`);
     res.status(201).json(room);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).json({ message: (err as Error).message });
   }
 };
@@ -38,10 +42,12 @@ export const joinRoom = async (req: Request, res: Response) => {
     const { roomId, username } = req.body;
 
     if (!username || typeof username !== "string" || !username.trim()) {
+      logger.warn("invalid username on joinRoom");
       return res.status(400).json({ message: "invalid username" });
     }
 
     if (!roomId) {
+      logger.warn("no roomId provided on joinRoom");
       return res.status(400).json({ message: "roomId is needed" });
     }
 
@@ -50,10 +56,12 @@ export const joinRoom = async (req: Request, res: Response) => {
     });
 
     if (!room) {
+      logger.warn(`room ${roomId} not found on joinRoom`);
       return res.status(404).json({ message: "room not found" });
     }
 
     if (room.status !== "waiting") {
+      logger.warn(`room ${roomId} already started`);
       return res
         .status(400)
         .json({ message: "cannot join room already started" });
@@ -64,6 +72,7 @@ export const joinRoom = async (req: Request, res: Response) => {
     });
 
     if (existing) {
+      logger.warn(`user ${username} already joined`);
       return res.status(400).json({ message: "user already joined" });
     }
 
@@ -71,9 +80,10 @@ export const joinRoom = async (req: Request, res: Response) => {
       data: { roomId, username },
     });
 
+    logger.info(`user ${username} joined room ${roomId}`);
     return res.status(201).json(participant);
   } catch (err) {
-    console.log(err);
+    console.error(`joinRoom error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
   }
 };
@@ -83,6 +93,7 @@ export const startRoom = async (req: Request, res: Response) => {
     const { roomId } = req.body;
 
     if (!roomId) {
+      logger.warn("no roomId provided on startRoom");
       return res.status(400).json({ message: "roomId is needed" });
     }
 
@@ -91,10 +102,12 @@ export const startRoom = async (req: Request, res: Response) => {
     });
 
     if (!room) {
+      logger.warn(`room ${roomId} not found on startRoom`);
       return res.status(404).json({ message: "room not found" });
     }
 
     if (room.status === "started") {
+      logger.warn(`room ${roomId} already started`);
       return res.status(400).json({ message: "room already started" });
     }
 
@@ -103,6 +116,7 @@ export const startRoom = async (req: Request, res: Response) => {
       data: { status: "started" },
     });
 
+    logger.info(`room ${roomId} started`);
     res.status(201).json(updatedRoom);
   } catch (err) {
     console.log(err);
@@ -115,10 +129,12 @@ export const finishRoom = async (req: Request, res: Response) => {
     const { username, roomId, userInput, timeTaken } = req.body;
 
     if (!username || typeof username !== "string" || !username.trim()) {
+      logger.warn("invalid username on finishRoom");
       return res.status(400).json({ message: "invalid username" });
     }
 
     if (!roomId || !userInput || !timeTaken) {
+      logger.warn("missing required fields on finishRoom");
       return res.status(400).json({ message: "missing required fields" });
     }
 
@@ -127,6 +143,7 @@ export const finishRoom = async (req: Request, res: Response) => {
     });
 
     if (!room) {
+      logger.warn(`room ${roomId} not found on finishRoom`);
       return res.status(404).json({ message: "room not found" });
     }
 
@@ -135,6 +152,7 @@ export const finishRoom = async (req: Request, res: Response) => {
     });
 
     if (!originalText) {
+      logger.warn(`text ${room.textId} not found on finishRoom`);
       return res.status(404).json({ message: "Text not found" });
     }
 
@@ -148,6 +166,9 @@ export const finishRoom = async (req: Request, res: Response) => {
     });
 
     if (existingResult) {
+      logger.warn(
+        `user ${username} already submitted result for room ${roomId}`
+      );
       return res.status(400).json({ message: "result already submitted" });
     }
 
@@ -173,6 +194,7 @@ export const finishRoom = async (req: Request, res: Response) => {
 
       await prisma.participant.deleteMany({ where: { roomId } });
       await prisma.room.delete({ where: { id: roomId } });
+      logger.info(`room ${roomId} finished and cleaned up`);
     }
 
     res.status(201).json(result);
@@ -187,7 +209,7 @@ export const getRooms = async (req: Request, res: Response) => {
     const rooms = await prisma.room.findMany();
     res.status(201).json(rooms);
   } catch (err) {
-    console.log(err);
+    console.error(`getRooms error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
   }
 };
@@ -197,11 +219,13 @@ export const getRoom = async (req: Request, res: Response) => {
     const { roomId } = req.params;
 
     if (!roomId) {
+      logger.warn("no roomId provided on getRoom");
       return res.status(400).json({ message: "provide roomId" });
     }
 
     const numericRoomId = Number(roomId);
     if (isNaN(numericRoomId)) {
+      logger.warn("Non-numeric roomId on getRoom");
       return res.status(400).json({ message: "roomId must be a number" });
     }
 
@@ -211,12 +235,13 @@ export const getRoom = async (req: Request, res: Response) => {
     });
 
     if (!room) {
+      logger.warn(`Room ${numericRoomId} not found on getRoom`);
       return res.status(404).json({ message: "Room not found" });
     }
 
     res.status(201).json(room);
   } catch (err) {
-    console.log(err);
+    logger.error(`getRoom error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
   }
 };
@@ -225,10 +250,12 @@ export const getRoomLeaderboard = async (req: Request, res: Response) => {
   try {
     const { roomId } = req.params;
     if (!roomId) {
+      logger.warn("no roomId provided on getRoomLeaderboard");
       return res.status(400).json({ message: "provide roomId" });
     }
     const numericRoomId = Number(roomId);
     if (isNaN(numericRoomId)) {
+      logger.warn("non-numeric roomId on getRoomLeaderboard");
       return res.status(400).json({ message: "roomId must be a number" });
     }
 
@@ -238,12 +265,13 @@ export const getRoomLeaderboard = async (req: Request, res: Response) => {
     });
 
     if (results.length === 0) {
+      logger.warn(`no results for room ${numericRoomId} on getRoomLeaderboard`);
       return res.status(404).json({ message: "No results for this room yet" });
     }
 
     res.json(results);
   } catch (err) {
-    console.log(err);
+    logger.error(`getRoomLeaderboard error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
   }
 };
