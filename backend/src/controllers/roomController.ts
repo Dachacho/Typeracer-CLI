@@ -201,6 +201,22 @@ export const finishRoom = async (req: Request, res: Response) => {
         where: { id: roomId },
         data: { status: "finished" },
       });
+
+      setTimeout(async () => {
+        try {
+          await prisma.result.deleteMany({ where: { roomId } });
+          await prisma.participant.deleteMany({ where: { roomId } });
+          await prisma.room.delete({ where: { id: roomId } });
+          logger.info(
+            `Deleted room ${roomId} and its results (2 minutes after finish)`
+          );
+        } catch (err) {
+          logger.error(
+            `Failed to delete room ${roomId}: ${(err as Error).message}`
+          );
+        }
+      }, 1000 * 60 * 2);
+
       logger.info(`room ${roomId} finished and cleaned up`);
     }
 
