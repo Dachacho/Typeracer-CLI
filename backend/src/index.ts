@@ -8,24 +8,26 @@ import roomRouter from "./routes/roomRouter.ts";
 import prisma from "./utils/prismaClient.ts";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import yaml from "yamljs";
 
 dotenv.config();
 
 const app = express();
 
+const swaggerDocument = yaml.load("./src/docs/swagger.yaml");
 try {
-  const swaggerSpec = swaggerJsdoc({
-    definition: {
-      openapi: "3.0.0",
-      info: {
-        title: "Typeracer API",
-        version: "1.0.0",
-      },
-    },
-    apis: ["./src/routes/*.ts"],
-  });
+  // const swaggerSpec = swaggerJsdoc({
+  //   definition: {
+  //     openapi: "3.0.0",
+  //     info: {
+  //       title: "Typeracer API",
+  //       version: "1.0.0",
+  //     },
+  //   },
+  //   apis: ["./src/routes/*.ts"],
+  // });
 
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 } catch (err) {
   console.error("failed: ", err);
 }

@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: Typeracer API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /text:
+    get:
+      summary: Get a random text for typing
+      responses:
+        "200":
+          description: A random text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Text"
+  /finish:
+    post:
+      summary: Submit single-player typing result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                textId:
+                  type: integer
+                userInput:
+                  type: string
+                timeTaken:
+                  type: number
+      responses:
+        "200":
+          description: Result submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+  /leaderboard:
+    get:
+      summary: Get global leaderboard
+      responses:
+        "200":
+          description: Leaderboard data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
+  /room:
+    post:
+      summary: Create a new multiplayer room
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        "201":
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+  /rooms:
+    get:
+      summary: List all rooms
+      responses:
+        "200":
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+  /room/join:
+    post:
+      summary: Join a multiplayer room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roomId:
+                  type: integer
+                username:
+                  type: string
+      responses:
+        "200":
+          description: Joined room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Participant"
+  /room/{roomId}:
+    get:
+      summary: Get room details
+      parameters:
+        - in: path
+          name: roomId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+  /room/{roomId}/leaderboard:
+    get:
+      summary: Get leaderboard for a specific room
+      parameters:
+        - in: path
+          name: roomId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Result"
+  /room/finish:
+    post:
+      summary: Submit multiplayer race result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                roomId:
+                  type: integer
+                userInput:
+                  type: string
+                timeTaken:
+                  type: number
+      responses:
+        "200":
+          description: Result submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+components:
+  schemas:
+    Text:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        textId:
+          type: integer
+        participants:
+          type: array
+          items:
+            $ref: "#/components/schemas/Participant"
+    Participant:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        roomId:
+          type: integer
+    Result:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        wpm:
+          type: number
+        accuracy:
+          type: number
+        roomId:
+          type: integer
+        textId:
+          type: integer
