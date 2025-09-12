@@ -13,6 +13,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - **Post-Race Menu:** Play again, view leaderboard, or quit—no need to restart the app.
 - **No Authentication Required:** Just enter your username and play.
 - **API Documentation:** OpenAPI/Swagger documentation for all the endpoints over at /api-docs.
+- **Structured Logging:** All backend events and errors are logged with timestamps using Winston.
 
 ## Features to be Added
 
@@ -96,6 +97,8 @@ typeracer/
 - Prisma (SQLite)
 - Inquirer, Chalk, Ora (for CLI UX)
 - Axios
+- Winston (logging)
+- OpenAPI/Swagger (API documentation)
 
 ---
 
