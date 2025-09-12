@@ -15,22 +15,8 @@ dotenv.config();
 const app = express();
 
 const swaggerDocument = yaml.load("./src/docs/swagger.yaml");
-try {
-  // const swaggerSpec = swaggerJsdoc({
-  //   definition: {
-  //     openapi: "3.0.0",
-  //     info: {
-  //       title: "Typeracer API",
-  //       version: "1.0.0",
-  //     },
-  //   },
-  //   apis: ["./src/routes/*.ts"],
-  // });
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-} catch (err) {
-  console.error("failed: ", err);
-}
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: "*" },
