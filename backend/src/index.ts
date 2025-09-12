@@ -6,7 +6,6 @@ import { Server } from "socket.io";
 import textRouter from "./routes/textRouter.ts";
 import roomRouter from "./routes/roomRouter.ts";
 import prisma from "./utils/prismaClient.ts";
-import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import yaml from "yamljs";
 
