@@ -20,9 +20,9 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 
 - [ ] **Custom Texts:** Let users add their own texts to the database.
 - [ ] **Timed Mode:** Type as much as possible in a set time.
-- [ ] **Export Results:** Export your results as CSV or JSON.
 - [ ] **Spectator Mode:** Watch ongoing races.
 - [ ] **Chat:** In-room chat for players.
+- [ ] **DB:** Migrate DB to Postgre.
 
 ## Getting Started
 
