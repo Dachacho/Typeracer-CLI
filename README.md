@@ -87,9 +87,11 @@ npm test
 ## Usage
 
 1. Enter your username when prompted.
-2. Type the displayed text as quickly and accurately as you can.
-3. See your WPM and accuracy.
-4. View the leaderboard to compare your results.
+2. Choose Singleplayer or Multiplayer (or Quit)
+   - If you choose Multiplayer join a room and wait.
+3. Type the displayed text as quickly and accurately as you can.
+4. See your WPM and accuracy.
+5. View the leaderboard to compare your results.
 
 ## Project Structure
 
