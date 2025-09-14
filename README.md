@@ -96,7 +96,7 @@ npm test
 ```
 
 typeracer/
-backend/ # Express API, Prisma models, SQLite DB
+backend/ # Express API, Prisma models, SQLite DB, Tests
 client/ # CLI app (TypeScript, Inquirer, Axios)
 
 ```
@@ -109,8 +109,9 @@ client/ # CLI app (TypeScript, Inquirer, Axios)
 - Prisma (SQLite)
 - Inquirer, Chalk, Ora (for CLI UX)
 - Axios
-- Winston (logging)
+- Winston (Logging)
 - OpenAPI/Swagger (API documentation)
+- Vitest/Supertest (Tests)
 
 ---
 
