@@ -159,6 +159,40 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Result"
+  /room/{roomId}/users:
+    get:
+      tags:
+        - Multiplayer
+      summary: Get current users in a room
+      parameters:
+        - in: path
+          name: roomId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of users in the room
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: string
+                    example: ["alice", "bob", "carol"]
+        "400":
+          description: Missing or invalid roomId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: roomId required
   /room/finish:
     post:
       tags:
