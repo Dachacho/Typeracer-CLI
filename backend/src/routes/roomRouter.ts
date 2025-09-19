@@ -19,6 +19,6 @@ router.post("/room/finish", finishRoom);
 router.get("/rooms", getRooms);
 router.get("/room/:roomId", getRoom);
 router.get("/room/:roomId/leaderboard", getRoomLeaderboard);
-router.get("room/:roomId/users", getRoomUsers);
+router.get("/room/:roomId/users", getRoomUsers);
 
 export default router;

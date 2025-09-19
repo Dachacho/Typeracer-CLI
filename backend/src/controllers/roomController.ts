@@ -17,6 +17,8 @@ export const createRoom = async (
   next: NextFunction
 ) => {
   try {
+    const { username } = req.body;
+
     const count = await prisma.text.count();
     if (count === 0) {
       logger.warn("no texts avaliable for room creation");
@@ -39,6 +41,13 @@ export const createRoom = async (
         status: "waiting",
       },
     });
+
+    if (username && typeof username === "string" && username.trim()) {
+      await prisma.participant.create({
+        data: { roomId: room.id, username },
+      });
+      await redis.sadd(`room:${room.id}:users`, username);
+    }
 
     logger.info(`room ${room.id} created`);
     res.status(201).json(room);
@@ -332,9 +341,35 @@ export const getRoomLeaderboard = async (
   }
 };
 
-export const getRoomUsers = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
-  if (!roomId) return res.status(400).json({ message: "roomId required" });
-  const users = await redis.smembers(`room:${roomId}:users`);
-  res.status(200).json({ users });
+export const getRoomUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { roomId } = req.params;
+    if (!roomId) {
+      return res.status(400).json({ message: "roomId required" });
+    }
+
+    const numericRoomId = Number(roomId);
+    if (isNaN(numericRoomId)) {
+      logger.warn("Non-numeric roomId on getRoomUsers");
+      return res.status(400).json({ message: "roomId must be a number" });
+    }
+
+    const room = await prisma.room.findUnique({
+      where: { id: numericRoomId },
+    });
+
+    if (!room) {
+      logger.warn(`Room ${numericRoomId} not found on getRoomUsers`);
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    const users = await redis.smembers(`room:${numericRoomId}:users`);
+    return res.status(200).json({ users });
+  } catch (err) {
+    next(err);
+  }
 };

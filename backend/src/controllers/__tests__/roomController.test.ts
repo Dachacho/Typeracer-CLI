@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../../app.ts";
+import redis from "../../utils/redisClient.ts";
 import { describe, it, expect } from "vitest";
 
 describe("Room Controller", () => {
@@ -142,5 +143,40 @@ describe("Room Controller", () => {
         expect(entry).toHaveProperty("accuracy");
       }
     }
+  });
+
+  it("should return the list of users in a room", async () => {
+    const createRes = await request(app)
+      .post("/room")
+      .send({ username: "hostuser" });
+
+    console.log("Create response:", createRes.body);
+    const roomId = createRes.body.id;
+
+    // Check Redis after creation
+    const usersAfterCreate = await redis.smembers(`room:${roomId}:users`);
+    console.log("Users in Redis after create:", usersAfterCreate);
+
+    const joinRes = await request(app)
+      .post("/room/join")
+      .send({ roomId, username: "guestuser" });
+
+    console.log("Join response:", joinRes.body);
+
+    // Check Redis after join
+    const usersAfterJoin = await redis.smembers(`room:${roomId}:users`);
+    console.log("Users in Redis after join:", usersAfterJoin);
+
+    const usersRes = await request(app).get(`/room/${roomId}/users`);
+
+    console.log("Users response:", usersRes.body);
+
+    expect(usersRes.statusCode).toBe(200);
+    expect(Array.isArray(usersRes.body.users)).toBe(true);
+    expect(usersRes.body.users).toEqual(
+      expect.arrayContaining(["hostuser", "guestuser"])
+    );
+
+    await redis.del(`room:${roomId}:users`);
   });
 });
