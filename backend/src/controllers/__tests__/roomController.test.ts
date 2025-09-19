@@ -153,7 +153,6 @@ describe("Room Controller", () => {
     console.log("Create response:", createRes.body);
     const roomId = createRes.body.id;
 
-    // Check Redis after creation
     const usersAfterCreate = await redis.smembers(`room:${roomId}:users`);
     console.log("Users in Redis after create:", usersAfterCreate);
 
@@ -163,7 +162,6 @@ describe("Room Controller", () => {
 
     console.log("Join response:", joinRes.body);
 
-    // Check Redis after join
     const usersAfterJoin = await redis.smembers(`room:${roomId}:users`);
     console.log("Users in Redis after join:", usersAfterJoin);
 
