@@ -177,4 +177,29 @@ describe("Room Controller", () => {
 
     await redis.del(`room:${roomId}:users`);
   });
+
+  it("should not allow joining a room over max capacity", async () => {
+    const ROOM_CAPACITY = 5;
+
+    const createRes = await request(app)
+      .post("/room")
+      .send({ username: "hostuser" });
+    const roomId = createRes.body.id;
+
+    for (let i = 1; i < ROOM_CAPACITY; i++) {
+      const res = await request(app)
+        .post("/room/join")
+        .send({ roomId, username: `user${i}` });
+      expect(res.statusCode).toBe(201);
+    }
+
+    const overRes = await request(app)
+      .post("/room/join")
+      .send({ roomId, username: "overflowuser" });
+
+    expect(overRes.statusCode).toBe(403);
+    expect(overRes.body).toHaveProperty("message", "Room is full");
+
+    await redis.del(`room:${roomId}:users`);
+  });
 });
