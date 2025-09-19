@@ -1,4 +1,4 @@
-import app from "../app.ts";
+import app from "./app.ts";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";

@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../../../app.ts";
+import app from "../../app.ts";
 import { describe, it, expect } from "vitest";
 
 describe("Room Controller", () => {
