@@ -16,6 +16,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - **Structured Logging:** All backend events and errors are logged with timestamps using Winston.
 - **Unit Tests:** Backend endpoints are covered by automated tests using Vitest and Supertest.
 - **DB:** Uses PostgreSQL (via docker-compose)
+- **Reids:** Tracks which users are in which room for real-time multiplayer / Enforces maximum room size efficiently.
 
 ## Features to be Added
 
@@ -57,7 +58,7 @@ npm install
 cd ../backend
 ```
 
-this project uses PostgreSQL as its DB. to set it up easiest way is via docker-compose
+this project uses PostgreSQL and Redis. to set it up easiest way is via docker-compose
 
 ```sh
 docker-compose up -d
@@ -124,6 +125,7 @@ client/ # CLI app (TypeScript, Inquirer, Axios)
 - OpenAPI/Swagger (API documentation)
 - Vitest/Supertest (Tests)
 - Docker
+- Redis (for real-time presence tracking, room capacity, and scalable multiplayer)
 
 ---
 
