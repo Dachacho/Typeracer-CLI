@@ -15,6 +15,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - **API Documentation:** OpenAPI/Swagger documentation for all the endpoints over at /api-docs.
 - **Structured Logging:** All backend events and errors are logged with timestamps using Winston.
 - **Unit Tests:** Backend endpoints are covered by automated tests using Vitest and Supertest.
+- **DB:** Uses PostgreSQL (Via docker-compose)
 
 ## Features to be Added
 
@@ -22,7 +23,6 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - [ ] **Timed Mode:** Type as much as possible in a set time.
 - [ ] **Spectator Mode:** Watch ongoing races.
 - [ ] **Chat:** In-room chat for players.
-- [ ] **DB:** Migrate DB to Postgre.
 
 ## Getting Started
 
@@ -55,6 +55,15 @@ npm install
 
 ```sh
 cd ../backend
+```
+
+this project uses PostgreSQL as its DB. to set it up easiest way is via docker-compose
+
+```sh
+docker-compose up -d
+```
+
+```sh
 npx prisma migrate dev --name init
 ```
 
@@ -108,12 +117,13 @@ client/ # CLI app (TypeScript, Inquirer, Axios)
 - Node.js
 - TypeScript
 - Express
-- Prisma (SQLite)
+- Prisma (PostgreSQL)
 - Inquirer, Chalk, Ora (for CLI UX)
 - Axios
 - Winston (Logging)
 - OpenAPI/Swagger (API documentation)
 - Vitest/Supertest (Tests)
+- Docker
 
 ---
 
