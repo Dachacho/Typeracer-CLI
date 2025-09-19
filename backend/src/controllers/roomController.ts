@@ -1,5 +1,5 @@
 import prisma from "../utils/prismaClient.ts";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import compare from "../utils/util.ts";
 import logger from "../utils/logger.ts";
 import redis from "../utils/redisClient.ts";
@@ -11,7 +11,11 @@ export function setIo(io: any) {
   ioInstance = io;
 }
 
-export const createRoom = async (req: Request, res: Response) => {
+export const createRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const count = await prisma.text.count();
     if (count === 0) {
@@ -39,12 +43,15 @@ export const createRoom = async (req: Request, res: Response) => {
     logger.info(`room ${room.id} created`);
     res.status(201).json(room);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const joinRoom = async (req: Request, res: Response) => {
+export const joinRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { roomId, username } = req.body;
 
@@ -98,12 +105,15 @@ export const joinRoom = async (req: Request, res: Response) => {
     logger.info(`user ${username} joined room ${roomId}`);
     return res.status(201).json(participant);
   } catch (err) {
-    console.error(`joinRoom error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const startRoom = async (req: Request, res: Response) => {
+export const startRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { roomId } = req.body;
 
@@ -134,12 +144,15 @@ export const startRoom = async (req: Request, res: Response) => {
     logger.info(`room ${roomId} started`);
     res.status(201).json(updatedRoom);
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const finishRoom = async (req: Request, res: Response) => {
+export const finishRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username, roomId, userInput, timeTaken } = req.body;
 
@@ -234,22 +247,28 @@ export const finishRoom = async (req: Request, res: Response) => {
     await redis.srem(`room:${roomId}:users`, username);
     res.status(201).json(result);
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const getRooms = async (req: Request, res: Response) => {
+export const getRooms = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const rooms = await prisma.room.findMany();
     res.status(200).json(rooms);
   } catch (err) {
-    console.error(`getRooms error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const getRoom = async (req: Request, res: Response) => {
+export const getRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { roomId } = req.params;
 
@@ -276,12 +295,15 @@ export const getRoom = async (req: Request, res: Response) => {
 
     res.status(200).json(room);
   } catch (err) {
-    logger.error(`getRoom error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const getRoomLeaderboard = async (req: Request, res: Response) => {
+export const getRoomLeaderboard = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { roomId } = req.params;
     if (!roomId) {
@@ -306,8 +328,7 @@ export const getRoomLeaderboard = async (req: Request, res: Response) => {
 
     res.status(200).json(results);
   } catch (err) {
-    logger.error(`getRoomLeaderboard error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 

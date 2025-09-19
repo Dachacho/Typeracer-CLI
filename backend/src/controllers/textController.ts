@@ -1,9 +1,13 @@
 import prisma from "../utils/prismaClient.ts";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import compare from "../utils/util.ts";
 import logger from "../utils/logger.ts";
 
-export const getText = async (req: Request, res: Response) => {
+export const getText = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const count = await prisma.text.count();
     const randomIndex = Math.floor(Math.random() * count);
@@ -14,12 +18,15 @@ export const getText = async (req: Request, res: Response) => {
     logger.info("random text served");
     res.status(200).json(randomText);
   } catch (err) {
-    logger.error(`getText error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const finishText = async (req: Request, res: Response) => {
+export const finishText = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { username, textId, timeTaken, userInput } = req.body;
 
@@ -55,12 +62,15 @@ export const finishText = async (req: Request, res: Response) => {
     logger.info(`result saved for user ${username} on text ${textId}`);
     res.status(201).json(result);
   } catch (err) {
-    logger.error(`finishText error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
 
-export const getLeaderboard = async (req: Request, res: Response) => {
+export const getLeaderboard = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const leaderboard = await prisma.result.findMany({
       orderBy: [{ wpm: "desc" }, { accuracy: "desc" }],
@@ -69,7 +79,6 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     logger.info("leaderboard served");
     res.status(200).json(leaderboard);
   } catch (err) {
-    logger.error(`getLeaderboard error: ${(err as Error).message}`);
-    return res.status(500).json({ message: (err as Error).message });
+    next(err);
   }
 };
