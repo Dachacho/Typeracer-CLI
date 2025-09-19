@@ -15,7 +15,7 @@ A simple CLI-based Typeracer game with leaderboards, built with Node.js, TypeScr
 - **API Documentation:** OpenAPI/Swagger documentation for all the endpoints over at /api-docs.
 - **Structured Logging:** All backend events and errors are logged with timestamps using Winston.
 - **Unit Tests:** Backend endpoints are covered by automated tests using Vitest and Supertest.
-- **DB:** Uses PostgreSQL (Via docker-compose)
+- **DB:** Uses PostgreSQL (via docker-compose)
 
 ## Features to be Added
 
@@ -107,7 +107,7 @@ npm test
 ```
 
 typeracer/
-backend/ # Express API, Prisma models, SQLite DB, Tests
+backend/ # Express API, Prisma models, PostgreSQL, Tests
 client/ # CLI app (TypeScript, Inquirer, Axios)
 
 ```
