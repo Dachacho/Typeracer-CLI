@@ -4,6 +4,8 @@ import compare from "../utils/util.ts";
 import logger from "../utils/logger.ts";
 import redis from "../utils/redisClient.ts";
 
+const MAX_ROOM_CAPACITY = 5;
+
 let ioInstance: any = null;
 export function setIo(io: any) {
   ioInstance = io;
@@ -81,12 +83,19 @@ export const joinRoom = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "user already joined" });
     }
 
+    const userCount = await redis.scard(`room:${roomId}:users`);
+    if (userCount >= MAX_ROOM_CAPACITY) {
+      logger.warn(`room ${roomId} is full`);
+      return res.status(403).json({ message: "Room is full" });
+    }
+
     const participant = await prisma.participant.create({
       data: { roomId, username },
     });
 
-    logger.info(`user ${username} joined room ${roomId}`);
     await redis.sadd(`room:${roomId}:users`, username);
+
+    logger.info(`user ${username} joined room ${roomId}`);
     return res.status(201).json(participant);
   } catch (err) {
     console.error(`joinRoom error: ${(err as Error).message}`);
