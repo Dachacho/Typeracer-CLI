@@ -2,6 +2,7 @@ import prisma from "../utils/prismaClient.ts";
 import type { Request, Response } from "express";
 import compare from "../utils/util.ts";
 import logger from "../utils/logger.ts";
+import redis from "../utils/redisClient.ts";
 
 let ioInstance: any = null;
 export function setIo(io: any) {
@@ -85,6 +86,7 @@ export const joinRoom = async (req: Request, res: Response) => {
     });
 
     logger.info(`user ${username} joined room ${roomId}`);
+    await redis.sadd(`room:${roomId}:users`, username);
     return res.status(201).json(participant);
   } catch (err) {
     console.error(`joinRoom error: ${(err as Error).message}`);
@@ -220,6 +222,7 @@ export const finishRoom = async (req: Request, res: Response) => {
       logger.info(`room ${roomId} finished and cleaned up`);
     }
 
+    await redis.srem(`room:${roomId}:users`, username);
     res.status(201).json(result);
   } catch (err) {
     console.log(err);
@@ -297,4 +300,11 @@ export const getRoomLeaderboard = async (req: Request, res: Response) => {
     logger.error(`getRoomLeaderboard error: ${(err as Error).message}`);
     return res.status(500).json({ message: (err as Error).message });
   }
+};
+
+export const getRoomUsers = async (req: Request, res: Response) => {
+  const { roomId } = req.params;
+  if (!roomId) return res.status(400).json({ message: "roomId required" });
+  const users = await redis.smembers(`room:${roomId}:users`);
+  res.status(200).json({ users });
 };

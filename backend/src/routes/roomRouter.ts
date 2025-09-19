@@ -7,6 +7,7 @@ import {
   getRooms,
   getRoom,
   getRoomLeaderboard,
+  getRoomUsers,
 } from "../controllers/roomController.ts";
 
 const router = Router();
@@ -18,5 +19,6 @@ router.post("/room/finish", finishRoom);
 router.get("/rooms", getRooms);
 router.get("/room/:roomId", getRoom);
 router.get("/room/:roomId/leaderboard", getRoomLeaderboard);
+router.get("room/:roomId/users", getRoomUsers);
 
 export default router;
